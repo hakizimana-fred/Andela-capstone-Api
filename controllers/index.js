@@ -4,6 +4,7 @@ const Joi = require("joi");
 const argon2 = require('argon2');
 const generateToken = require("../utils/generateToken");
 const Comment = require('../models/Comment')
+const Like = require('../models/Like')
 const mongoose = require('mongoose')
 
 // Joi validation
@@ -209,6 +210,46 @@ const getComments = async (req, res) => {
 }
 
 
+const postLike = async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
+    const blogFound = await Post.findById(req.params.blogId)
+    if (!blogFound) return res.status(400).json({message: "No blog found"})
+    const user = req.user
+    // check if we're not liking for the second time
+    const liked = await Like.findOne({user})
+    if (liked) {
+       return res.status(400).json({message: "you cannot like twice"})
+    }else {
+       const newLike = new Like({
+          user,
+          post: req.params.blogId,
+       })
+       // check if likes already has a count of greather than 0 
+       const likedPost = await Like.findOne({post: req.params.blogId})
+       if (likedPost && likedPost.likeCount > 0) {
+        console.log('there is already')
+          // updated
+          const doc = await Like.findOneAndUpdate({_id: likedPost._id}, {$set: {likeCount: likedPost.likeCount +=1}}, { new: true})
+          await doc.save()
+          return res.status(200).json(doc)
+       }else {
+         newLike.likeCount ++
+        // save like
+          await newLike.save()
+          return res.status(200).json(newLike)
+       }
+
+
+    }
+  
+    
+
+  }catch(err) {
+    console.log(err)
+  }
+}
+
 
 module.exports = {
   signupUser,
@@ -219,5 +260,6 @@ module.exports = {
   updatePost,
   deletePost,
   postComment,
-  getComments
+  getComments,
+  postLike
 };
