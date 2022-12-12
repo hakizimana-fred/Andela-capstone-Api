@@ -26,7 +26,7 @@ router.patch("/posts/:id", auth, authorize, updatePost);
 router.delete("/posts/:id", auth, authorize, deletePost);
 
 // comments routes
-router.get('/post/comments', getComments)
-router.post('/post/comments', postComment)
+router.get('/post/comments/:blogId', auth, getComments)
+router.post('/post/comments/:blogId', auth, postComment)
 
 module.exports = router;

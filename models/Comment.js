@@ -5,6 +5,10 @@ const commentSchema = new mongoose.Schema({
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'User'
 	},
+	username: {
+		type: String,
+		required: true
+	},
 	post: {		
 		type: mongoose.Schema.Types.ObjectId,
 		ref: 'Post'
@@ -13,7 +17,7 @@ const commentSchema = new mongoose.Schema({
 		type: String, 
 		required: true
 	}
-}, { timestamps: true})
+}, { timestamps: true}, {strict: false})
 
 
 module.exports = mongoose.model('Comment', commentSchema)

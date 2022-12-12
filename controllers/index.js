@@ -4,6 +4,7 @@ const Joi = require("joi");
 const argon2 = require('argon2');
 const generateToken = require("../utils/generateToken");
 const Comment = require('../models/Comment')
+const mongoose = require('mongoose')
 
 // Joi validation
 const postSchema = Joi.object({
@@ -78,9 +79,6 @@ const loginUser = async (req, res) => {
       return res.status(400).json({message: "Invalid credentials"})
    }
 }
-
-
-
 
 
 // Post controller
@@ -170,10 +168,25 @@ const deletePost = async (req, res) => {
 
 const postComment = async (req, res) => {
   try {
-    const comment = new Comment(req.body)
-    await comment.save()
-    return res.status(201).json(comment)
+    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
+    const user = req.user
 
+    const blogFound = await Post.findById(req.params.blogId)
+    const userFound = await User.findById(req.user)
+
+    if (userFound && blogFound) {
+        const comment = new Comment({
+          user,
+          post: req.params.blogId,
+          content: req.body.content,
+          username: userFound.name
+        })
+        await comment.save()
+        return res.status(201).json(comment)
+    }else {
+      return res.status(200).json({message: "Something went wrong"})
+    }
+    
   }catch(err) {
     return res.status(201).json({err: err.message})
   }
@@ -182,11 +195,13 @@ const postComment = async (req, res) => {
 
 const getComments = async (req, res) => {
   try {
-    const comments = await Comment.find({})
-    if (comments.length > 0) {
-      return res.status(200).json(comments)
-    }
+    // have to retrive the user and blog associated to the comment
+    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
 
+    const comments = await Comment.find({post: req.params.blogId})
+    if (comments.length > 0) return res.status(200).json(comments)
+
+     return res.status(400).json({message: "no comments found"})
   }catch(err) {
 
       return res.status(400).json({err: err.message})
