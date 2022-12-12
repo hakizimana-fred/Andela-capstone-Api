@@ -2,10 +2,13 @@ const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const morgan = require("morgan");
+const dotenv = require('dotenv')
+
+dotenv.config()
 
 const run = async () => {
    try{ 
-    await mongoose.connect('mongodb://localhost/capstonedb') 
+    await mongoose.connect(process.env.MONGO_URI) 
     console.log('DB started successfully')
 
     const app = express();

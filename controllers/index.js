@@ -3,10 +3,12 @@ const User = require('../models/User')
 const Joi = require("joi");
 const argon2 = require('argon2');
 const generateToken = require("../utils/generateToken");
+const Comment = require('../models/Comment')
 
 // Joi validation
 const postSchema = Joi.object({
   title: Joi.string().required(),
+  author: Joi.string().min(4).required(),
   content: Joi.string().min(5).required(),
 });
 
@@ -20,15 +22,24 @@ const signupUser = async (req, res) => {
      const newUser = new User({
       name: req.body.name,
       email: req.body.email,
+      role: req.body.role || "user"
      })
      const hashedPassword = await argon2.hash(req.body.password)
      newUser.password = hashedPassword
      const savedUser = await newUser.save()
      const token = generateToken(savedUser)
 
+        const userResponse = {
+          id: savedUser._id, 
+          name: savedUser.name, 
+          email: savedUser.email, 
+          role: savedUser.role
+        }
+ 
+
      return res.status(200).json({
        user: {
-        ...savedUser,
+        ...userResponse,
         token
        }
      })
@@ -46,9 +57,16 @@ const loginUser = async (req, res) => {
 
      if (user && isValidPassword) {
         const token = generateToken(user)
+
+        const userResponse = {
+          id: user._id, 
+          name: user.name, 
+          email: user.email, 
+          role: user.role
+        }
         return res.status(200).json({
           user: {
-            ...user,
+            ...userResponse,
             token
           }
         })
@@ -87,7 +105,9 @@ const savePost = async (req, res) => {
     const post = new Post({
       title: req.body.title,
       content: req.body.content,
+      author: req.body.author,
     });
+
     await post.save();
     res.send(post);
   } catch (err) {
@@ -150,15 +170,27 @@ const deletePost = async (req, res) => {
 
 const postComment = async (req, res) => {
   try {
+    const comment = new Comment(req.body)
+    await comment.save()
+    return res.status(201).json(comment)
 
-  }catch(err) {}
+  }catch(err) {
+    return res.status(201).json({err: err.message})
+  }
 }
 
 
 const getComments = async (req, res) => {
   try {
+    const comments = await Comment.find({})
+    if (comments.length > 0) {
+      return res.status(200).json(comments)
+    }
 
-  }catch(err) {}
+  }catch(err) {
+
+      return res.status(400).json({err: err.message})
+  }
 }
 
 

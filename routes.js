@@ -1,4 +1,5 @@
 const express = require("express");
+const { authorize,auth }  = require('./utils/authorize')
 const {
   getPosts,
   savePost,
@@ -7,6 +8,8 @@ const {
   deletePost,
   signupUser,
   loginUser,
+  getComments,
+  postComment,
 } = require("./controllers");
 
 const router = express.Router();
@@ -15,12 +18,15 @@ const router = express.Router();
 router.post('/user/signup', signupUser)
 router.post('/user/login', loginUser)
 
-
 // Post routes
-router.get("/posts", getPosts);
-router.post("/posts", savePost);
+router.get("/posts", auth, getPosts);
+router.post("/posts", auth, authorize, savePost);
 router.get("/posts/:id", getSinglePost);
-router.patch("/posts/:id", updatePost);
-router.delete("/posts/:id", deletePost);
+router.patch("/posts/:id", auth, authorize, updatePost);
+router.delete("/posts/:id", auth, authorize, deletePost);
+
+// comments routes
+router.get('/post/comments', getComments)
+router.post('/post/comments', postComment)
 
 module.exports = router;
