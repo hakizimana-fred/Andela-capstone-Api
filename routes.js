@@ -11,6 +11,7 @@ const {
   getComments,
   postComment,
   postLike,
+  getLikes,
 } = require("./controllers");
 
 const router = express.Router();
@@ -32,5 +33,6 @@ router.post('/post/comments/:blogId', auth, postComment)
 
 // Like routes
 router.post('/post/likes/:blogId', auth, postLike)
+router.get('/get/likes/:blogId', auth, getLikes)
 
 module.exports = router;

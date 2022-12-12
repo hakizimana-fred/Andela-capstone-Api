@@ -239,14 +239,23 @@ const postLike = async (req, res) => {
           await newLike.save()
           return res.status(200).json(newLike)
        }
-
-
-    }
-  
-    
+    } 
 
   }catch(err) {
     console.log(err)
+  }
+}
+
+const getLikes = async (req, res) => {
+  try {
+    // have to retrive the user and blog associated to the comment
+    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
+
+      const likes = await Like.find({post: req.params.blogId})
+      if (likes.length > 0) return res.status(200).json(likes)
+     return res.status(400).json({message: "no likes found"})
+  }catch(err) {
+      return res.status(400).json({err: err.message})
   }
 }
 
@@ -261,5 +270,6 @@ module.exports = {
   deletePost,
   postComment,
   getComments,
-  postLike
+  postLike,
+  getLikes
 };
