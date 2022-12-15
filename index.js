@@ -5,7 +5,6 @@ const morgan = require("morgan");
 const dotenv = require('dotenv')
 
 dotenv.config()
-let process = process.env.MONGO_URI
 
 const run = async () => {
    try{ 

@@ -14,9 +14,32 @@ const postSchema = Joi.object({
   content: Joi.string().min(5).required(),
 });
 
+const userSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(5),
+})
+
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(5),
+})
+
+const comment = Joi.object({
+  content: Joi.string().required(),
+})
+
+
 // User Controller
 const signupUser = async (req, res) => {
    try{ 
+
+    const { error, value } = userSchema.validate(req.body);
+
+    if (error) {
+      console.log(error);
+      return res.send(error.details);
+    }
      // find if User exists
      const user = await User.findOne({email: req.body.email})
      if (user) return res.status(400).json({message: "User already exists"})
@@ -53,6 +76,12 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
    try{ 
+     const { error, value } = loginSchema.validate(req.body);
+
+    if (error) {
+      return res.send(error.details)
+    }
+
      // find if User exists and password is valid
      const user = await User.findOne({email: req.body.email})
      const isValidPassword = await argon2.verify(user.password, req.body.password)
@@ -258,6 +287,17 @@ const getLikes = async (req, res) => {
   }
 }
 
+const makeUserAnAdmin = async(req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.userId)) return res.status(400).json({message: "Invalid blog id"})
+    const user = await User.findOneAndUpdate({_id: userId}, {$set: {role: "admin"}}, {new: true})
+    await user.save()
+    return res.status(200).json({message: "successfully made" + user.name + "an admin"})
+  }catch(err) {
+    return res.status(200).json({err: err.messae})
+  }
+}
+
 
 module.exports = {
   signupUser,
@@ -270,5 +310,6 @@ module.exports = {
   postComment,
   getComments,
   postLike,
-  getLikes
+  getLikes,
+  makeUserAnAdmin
 };

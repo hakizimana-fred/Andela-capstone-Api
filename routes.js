@@ -12,6 +12,7 @@ const {
   postComment,
   postLike,
   getLikes,
+  makeUserAnAdmin,
 } = require("./controllers");
 
 const router = express.Router();
@@ -19,6 +20,7 @@ const router = express.Router();
 
 router.post('/user/signup', signupUser)
 router.post('/user/login', loginUser)
+router.post('/user/make-admin/:userId', auth, authorize, makeUserAnAdmin)
 
 // Post routes
 router.get("/posts", auth, getPosts);
