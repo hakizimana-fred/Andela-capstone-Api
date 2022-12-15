@@ -5,11 +5,11 @@ const morgan = require("morgan");
 const dotenv = require('dotenv')
 
 dotenv.config()
+let process = process.env.MONGO_URI
 
 const run = async () => {
    try{ 
     await mongoose.connect(process.env.MONGO_URI) 
-    console.log('DB started successfully')
 
     const app = express();
     app.use(express.json());

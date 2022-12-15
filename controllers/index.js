@@ -226,9 +226,8 @@ const postLike = async (req, res) => {
           post: req.params.blogId,
        })
        // check if likes already has a count of greather than 0 
-       const likedPost = await Like.findOne({post: req.params.blogId})
-       if (likedPost && likedPost.likeCount > 0) {
-        console.log('there is already')
+        const likedPost = await Like.findOne({post: req.params.blogId})
+        if (likedPost && likedPost.likeCount > 0) {
           // updated
           const doc = await Like.findOneAndUpdate({_id: likedPost._id}, {$set: {likeCount: likedPost.likeCount +=1}}, { new: true})
           await doc.save()
