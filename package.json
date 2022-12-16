@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "NODE_ENV=production node index.js",
     "coverage": "npm run test && nyc report",
-    "dev": "nodemon index.js",
+    "dev": "NODE_ENV=development nodemon index.js",
     "prettier": "prettier --write .",
-    "test": " NODE_ENV=testing mocha --recursive --exit --timeout 10000"
+    "test": " NODE_ENV=test mocha --recursive --exit --timeout 10000"
   },
   "keywords": [],
   "author": "Hakizimana Fred",
