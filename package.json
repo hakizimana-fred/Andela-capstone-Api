@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "coverage": "npm run test && nyc report",
     "dev": "nodemon index.js",
     "prettier": "prettier --write .",
-    "test": "NODE_ENV=testing mocha --recursive --exit --timeout 10000"
+    "test": " NODE_ENV=testing mocha --recursive --exit --timeout 10000"
   },
   "keywords": [],
   "author": "Hakizimana Fred",
@@ -15,6 +16,7 @@
   "dependencies": {
     "add": "^2.0.6",
     "argon2": "^0.30.2",
+    "compression": "^1.7.4",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
     "joi": "^17.7.0",

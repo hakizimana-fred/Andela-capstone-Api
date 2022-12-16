@@ -1,11 +1,11 @@
 const Post = require("../models/Post");
-const User = require('../models/User')
+const User = require("../models/User");
 const Joi = require("joi");
-const argon2 = require('argon2');
+const argon2 = require("argon2");
 const generateToken = require("../utils/generateToken");
-const Comment = require('../models/Comment')
-const Like = require('../models/Like')
-const mongoose = require('mongoose')
+const Comment = require("../models/Comment");
+const Like = require("../models/Like");
+const mongoose = require("mongoose");
 
 // Joi validation
 const postSchema = Joi.object({
@@ -18,98 +18,95 @@ const userSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(5),
-})
+});
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(5),
-})
+});
 
 const comment = Joi.object({
   content: Joi.string().required(),
-})
-
+});
 
 // User Controller
 const signupUser = async (req, res) => {
-   try{ 
-
+  try {
     const { error, value } = userSchema.validate(req.body);
 
     if (error) {
       console.log(error);
       return res.send(error.details);
     }
-     // find if User exists
-     const user = await User.findOne({email: req.body.email})
-     if (user) return res.status(400).json({message: "User already exists"})
-     // find if User does not exist and create new user
-     const newUser = new User({
+    // find if User exists
+    const user = await User.findOne({ email: req.body.email });
+    if (user) return res.status(400).json({ message: "User already exists" });
+    // find if User does not exist and create new user
+    const newUser = new User({
       name: req.body.name,
       email: req.body.email,
-      role: req.body.role || "user"
-     })
-     const hashedPassword = await argon2.hash(req.body.password)
-     newUser.password = hashedPassword
-     const savedUser = await newUser.save()
-     const token = generateToken(savedUser)
+      role: req.body.role || "user",
+    });
+    const hashedPassword = await argon2.hash(req.body.password);
+    newUser.password = hashedPassword;
+    const savedUser = await newUser.save();
+    const token = generateToken(savedUser);
 
-        const userResponse = {
-          id: savedUser._id, 
-          name: savedUser.name, 
-          email: savedUser.email, 
-          role: savedUser.role
-        }
- 
+    const userResponse = {
+      id: savedUser._id,
+      name: savedUser.name,
+      email: savedUser.email,
+      role: savedUser.role,
+    };
 
-     return res.status(200).json({
-       user: {
+    return res.status(200).json({
+      user: {
         ...userResponse,
-        token
-       }
-     })
-
-   }catch(err) {
-    return res.status(400).json({err: err.message})
-   }
-}
+        token,
+      },
+    });
+  } catch (err) {
+    return res.status(400).json({ err: err.message });
+  }
+};
 
 const loginUser = async (req, res) => {
-   try{ 
-     const { error, value } = loginSchema.validate(req.body);
+  try {
+    const { error, value } = loginSchema.validate(req.body);
 
     if (error) {
-      return res.send(error.details)
+      return res.send(error.details);
     }
 
-     // find if User exists and password is valid
-     const user = await User.findOne({email: req.body.email})
-     const isValidPassword = await argon2.verify(user.password, req.body.password)
+    // find if User exists and password is valid
+    const user = await User.findOne({ email: req.body.email });
+    const isValidPassword = await argon2.verify(
+      user.password,
+      req.body.password
+    );
 
-     if (user && isValidPassword) {
-        const token = generateToken(user)
+    if (user && isValidPassword) {
+      const token = generateToken(user);
 
-        const userResponse = {
-          id: user._id, 
-          name: user.name, 
-          email: user.email, 
-          role: user.role
-        }
-        return res.status(200).json({
-          user: {
-            ...userResponse,
-            token
-          }
-        })
-     }else {
-      return res.status(400).json({message: "Invalid credentials"})
-     }
-    
-   }catch(err) {
-      return res.status(400).json({message: "Invalid credentials"})
-   }
-}
-
+      const userResponse = {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      };
+      return res.status(200).json({
+        user: {
+          ...userResponse,
+          token,
+        },
+      });
+    } else {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+  } catch (err) {
+    return res.status(400).json({ message: "Invalid credentials" });
+  }
+};
 
 // Post controller
 const getPosts = async (req, res) => {
@@ -198,106 +195,115 @@ const deletePost = async (req, res) => {
 
 const postComment = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
-    const user = req.user
+    if (!mongoose.isValidObjectId(req.params.blogId))
+      return res.status(400).json({ message: "Invalid blog id" });
+    const user = req.user;
 
-    const blogFound = await Post.findById(req.params.blogId)
-    const userFound = await User.findById(req.user)
+    const blogFound = await Post.findById(req.params.blogId);
+    const userFound = await User.findById(req.user);
 
     if (userFound && blogFound) {
-        const comment = new Comment({
-          user,
-          post: req.params.blogId,
-          content: req.body.content,
-          username: userFound.name
-        })
-        await comment.save()
-        return res.status(201).json(comment)
-    }else {
-      return res.status(200).json({message: "Something went wrong"})
+      const comment = new Comment({
+        user,
+        post: req.params.blogId,
+        content: req.body.content,
+        username: userFound.name,
+      });
+      await comment.save();
+      return res.status(201).json(comment);
+    } else {
+      return res.status(200).json({ message: "Something went wrong" });
     }
-    
-  }catch(err) {
-    return res.status(201).json({err: err.message})
+  } catch (err) {
+    return res.status(201).json({ err: err.message });
   }
-}
-
+};
 
 const getComments = async (req, res) => {
   try {
     // have to retrive the user and blog associated to the comment
-    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
+    if (!mongoose.isValidObjectId(req.params.blogId))
+      return res.status(400).json({ message: "Invalid blog id" });
 
-    const comments = await Comment.find({post: req.params.blogId})
-    if (comments.length > 0) return res.status(200).json(comments)
+    const comments = await Comment.find({ post: req.params.blogId });
+    if (comments.length > 0) return res.status(200).json(comments);
 
-     return res.status(400).json({message: "no comments found"})
-  }catch(err) {
-
-      return res.status(400).json({err: err.message})
+    return res.status(400).json({ message: "no comments found" });
+  } catch (err) {
+    return res.status(400).json({ err: err.message });
   }
-}
-
+};
 
 const postLike = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
-    const blogFound = await Post.findById(req.params.blogId)
-    if (!blogFound) return res.status(400).json({message: "No blog found"})
-    const user = req.user
+    if (!mongoose.isValidObjectId(req.params.blogId))
+      return res.status(400).json({ message: "Invalid blog id" });
+    const blogFound = await Post.findById(req.params.blogId);
+    if (!blogFound) return res.status(400).json({ message: "No blog found" });
+    const user = req.user;
     // check if we're not liking for the second time
-    const liked = await Like.findOne({user})
+    const liked = await Like.findOne({ user });
     if (liked) {
-       return res.status(400).json({message: "you cannot like twice"})
-    }else {
-       const newLike = new Like({
-          user,
-          post: req.params.blogId,
-       })
-       // check if likes already has a count of greather than 0 
-        const likedPost = await Like.findOne({post: req.params.blogId})
-        if (likedPost && likedPost.likeCount > 0) {
-          // updated
-          const doc = await Like.findOneAndUpdate({_id: likedPost._id}, {$set: {likeCount: likedPost.likeCount +=1}}, { new: true})
-          await doc.save()
-          return res.status(200).json(doc)
-       }else {
-         newLike.likeCount ++
+      return res.status(400).json({ message: "you cannot like twice" });
+    } else {
+      const newLike = new Like({
+        user,
+        post: req.params.blogId,
+      });
+      // check if likes already has a count of greather than 0
+      const likedPost = await Like.findOne({ post: req.params.blogId });
+      if (likedPost && likedPost.likeCount > 0) {
+        // updated
+        const doc = await Like.findOneAndUpdate(
+          { _id: likedPost._id },
+          { $set: { likeCount: (likedPost.likeCount += 1) } },
+          { new: true }
+        );
+        await doc.save();
+        return res.status(200).json(doc);
+      } else {
+        newLike.likeCount++;
         // save like
-          await newLike.save()
-          return res.status(200).json(newLike)
-       }
-    } 
-
-  }catch(err) {
-    console.log(err)
+        await newLike.save();
+        return res.status(200).json(newLike);
+      }
+    }
+  } catch (err) {
+    console.log(err);
   }
-}
+};
 
 const getLikes = async (req, res) => {
   try {
     // have to retrive the user and blog associated to the comment
-    if (!mongoose.isValidObjectId(req.params.blogId)) return res.status(400).json({message: "Invalid blog id"})
+    if (!mongoose.isValidObjectId(req.params.blogId))
+      return res.status(400).json({ message: "Invalid blog id" });
 
-      const likes = await Like.find({post: req.params.blogId})
-      if (likes.length > 0) return res.status(200).json(likes)
-     return res.status(400).json({message: "no likes found"})
-  }catch(err) {
-      return res.status(400).json({err: err.message})
+    const likes = await Like.find({ post: req.params.blogId });
+    if (likes.length > 0) return res.status(200).json(likes);
+    return res.status(400).json({ message: "no likes found" });
+  } catch (err) {
+    return res.status(400).json({ err: err.message });
   }
-}
+};
 
-const makeUserAnAdmin = async(req, res) => {
+const makeUserAnAdmin = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.userId)) return res.status(400).json({message: "Invalid blog id"})
-    const user = await User.findOneAndUpdate({_id: userId}, {$set: {role: "admin"}}, {new: true})
-    await user.save()
-    return res.status(200).json({message: "successfully made" + user.name + "an admin"})
-  }catch(err) {
-    return res.status(200).json({err: err.messae})
+    if (!mongoose.isValidObjectId(req.params.userId))
+      return res.status(400).json({ message: "Invalid blog id" });
+    const user = await User.findOneAndUpdate(
+      { _id: userId },
+      { $set: { role: "admin" } },
+      { new: true }
+    );
+    await user.save();
+    return res
+      .status(200)
+      .json({ message: "successfully made" + user.name + "an admin" });
+  } catch (err) {
+    return res.status(200).json({ err: err.messae });
   }
-}
-
+};
 
 module.exports = {
   signupUser,
@@ -311,5 +317,5 @@ module.exports = {
   getComments,
   postLike,
   getLikes,
-  makeUserAnAdmin
+  makeUserAnAdmin,
 };

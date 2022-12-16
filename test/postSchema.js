@@ -1,50 +1,69 @@
-const Post = require('../models/Post')
-const assert = require('assert')
-const { expect } = require('chai')
+const Post = require("../models/Post");
+const assert = require("assert");
+const { expect } = require("chai");
 
-let post
+let post;
 
 beforeEach(async () => {
-    post = new Post({title: "javascript", author: "testing", content: "testing content"})
-    await post.save()
-})
+  post = new Post({
+    title: "javascript",
+    author: "testing",
+    content: "testing content",
+  });
+  await post.save();
+});
 
 //  post Schema Tests
-describe('Does all Crud operations', () => {
-    it ('creates a new post', async() => {
-        const newPost = new Post({title: "Learn php", author: "Fred", content: "I am here to learn!"})
-        await newPost.save()
-        assert(!newPost.isNew)
-    })
-    it ('Reads all  Posts', async () => {
-        const posts = await Post({})
-        expect(posts).length.to.not.equal(0)
-    }) 
-})
+describe("Does all Crud operations", () => {
+  it("creates a new post", async () => {
+    const newPost = new Post({
+      title: "Learn php",
+      author: "Fred",
+      content: "I am here to learn!",
+    });
+    await newPost.save();
+    assert(!newPost.isNew);
+  });
+  it("Reads all  Posts", async () => {
+    const posts = await Post({});
+    expect(posts).length.to.not.equal(0);
+  });
+});
 
+describe("Deleting Post", () => {
+  let mypost;
+  beforeEach(async () => {
+    mypost = new Post({
+      title: "deletion",
+      author: "deletion",
+      content: "deleted content",
+    });
+    await mypost.save();
+  });
 
-describe('Deleting Post', () => {
-    let mypost 
-    beforeEach(async () => {
-        mypost = new Post({title: "deletion", author: "deletion", content: "deleted content"})
-        await mypost.save()
-    })
+  it("Removes post", async () => {
+    const post = await Post.findOneAndRemove({ _id: mypost._id });
+    const singlePost = await Post.findOne({ title: "deletion" });
+    assert(singlePost === null);
+  });
+});
 
-    it ('Removes post', async () => {
-       const post = await Post.findOneAndRemove({_id: mypost._id}) 
-       const singlePost = await Post.findOne({title: "deletion"})
-       assert(singlePost === null)
-    })
-})
+describe("Update Post", () => {
+  let mypost;
+  beforeEach(async () => {
+    mypost = new Post({
+      title: "updated",
+      author: "updated",
+      content: "updated content",
+    });
+    await mypost.save();
+  });
 
-describe('Update Post', () => {
-    let mypost 
-    beforeEach(async () => {
-        mypost = new Post({title: "updated", author: "updated", content: "updated content"})
-        await mypost.save()
-    })
-
-    it ('update new content', async () => {
-        await Post.findOneAndUpdate({_id: mypost._id}, { title: "new update", content: "new content", author: "new author"}, { new: true}) 
-    })
-})
+  it("update new content", async () => {
+    await Post.findOneAndUpdate(
+      { _id: mypost._id },
+      { title: "new update", content: "new content", author: "new author" },
+      { new: true }
+    );
+  });
+});
