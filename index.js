@@ -5,11 +5,14 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const compression = require("compression");
 const DB_NAME = require("./constants/DB_CONNECTION");
+const swaggerUi = require('swagger-ui-express')
+const YAML = require('yamljs')
+
+const apiDocumentation = YAML.load('./swagger.yml')
+
 
 dotenv.config();
 const app = express();
-
-
 
 const run = async () => {
   try {
@@ -21,9 +24,10 @@ const run = async () => {
     app.use(express.json());
     app.use(morgan("dev"));
     app.use(compression());
+    app.use('/', swaggerUi.serve, swaggerUi.setup(apiDocumentation))
     app.use("/api", routes);
 
-    app.listen(5000, () => {
+    app.listen(process.env.PORT, () => {
       console.log("Server has started!");
     });
   } catch (err) {
