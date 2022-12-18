@@ -271,12 +271,6 @@ paths:
                 type: array
                 $ref: '#components/schemas/Likes'
 
-
-
-     
-      
-
-
 components: 
   schemas:
     Signup:
