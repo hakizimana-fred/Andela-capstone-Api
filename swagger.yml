@@ -1,0 +1,392 @@
+openapi: 3.0.3
+info:
+  title: Andela Capstone Blog Api V.1
+  description: |-
+    This is an Andela Capstone Blog api built with Nodejs technology. 
+    The purpose of this api is to have users be able to Signup/Login(Authentication) and View posted blogs.
+    Only an Admin Can Delete,Post,Edit a blog. An admin can also grant another user admin priveleges!
+  contact: 
+    email: hakifred20@gmail.com
+servers:
+  - url: http://127.0.0.1:5000/api/
+tags:
+  - name: Blog API
+    description: All Endpoints of the blog Api
+paths: 
+  /user/signup:
+    post:
+      tags:
+        - Signup
+      summary: New User Registration process
+      description: Register a new user if he's not already registered 
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Signup'
+        required: true
+      responses: 
+        '200':
+          description: "User Registered Successfully"
+          content:
+            application/json:
+              schema:
+                $ref: '#components/schemas/SignupResponse'
+  /user/login:
+    post:
+      tags:
+        - Login
+      summary: Login User process
+      descriptions: Login a user if they already exist
+      requestBody:
+        content: 
+          application/json:
+            schema:
+              $ref: '#components/schemas/Login'
+        required: true
+      responses: 
+        '200':
+          description: "User logged in successfully"
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/LoginResponse'
+  /posts:
+    post:
+      tags: 
+        - Post
+      summary: Post a Blog
+      description: Post a blog and it gets saved to MongoDB
+      parameters:
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      requestBody: 
+        content: 
+          application/json:
+            schema:
+              $ref: '#components/schemas/Post'
+        required: true
+    get:
+      tags:
+        - Post
+      summary: Get all saved Blogs
+      description: This will fetch all posts saved in MongoDB
+      parameters:
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses: 
+        '200':
+          description: "Fetched posts successfully"
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#components/schemas/Post'
+  /posts/{postId}:
+    get:
+      tags: 
+        - Post
+      summary: Find a post by ID
+      description: This will return a post based off it's ID
+      operationId: getPostById
+      parameters:
+        - in: path
+          name: postId
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+
+      responses:
+        '200':
+          description: Fetched post by id
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/Post'
+    put:
+      tags: 
+        - Post
+      summary: Update a post by ID
+      description: This will update a post based off it's ID
+      operationId: Update by id
+      parameters:
+        - in: path
+          name: updatedpostbyid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+
+      responses:
+        '200':
+          description: Update post by id
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/Post'
+    delete:
+      tags: 
+        - Post
+      summary: Delete a post by ID
+      description: This will Delete a post based off it's ID
+      operationId: Delete by id
+      parameters:
+        - in: path
+          name: deletedpostbyid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Update post by id
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/Post'
+  /post/comments/{postId}:
+    get:
+      tags: 
+        - Comments
+      summary: This will return comments associated to the post
+      description: This will return comments associated to the post
+      operationId: Comment by id
+      parameters:
+        - in: path
+          name: getcommentbypostid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Get post comments by id
+          content: 
+            application/json:
+              schema:
+                type: array
+                items: 
+                  $ref: '#components/schemas/Comments'
+    post:
+      tags: 
+        - Comments
+      summary: This will post  a comment associated to the post
+      operationId: Comment by id
+      parameters:
+        - in: path
+          name: getcommentbypostid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Get post comments by id
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/Comments'
+  /post/likes/{postId}:
+    post:
+      tags: 
+        - Likes
+      summary: This will like  a post associated to the post
+      operationId: Comment by id
+      parameters:
+        - in: path
+          name: getcommentbypostid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Get post comments by id
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/Likes'
+    get:
+      tags: 
+        - Likes
+      summary: This will like  a post associated to the post
+      operationId: Comment by id
+      parameters:
+        - in: path
+          name: getcommentbypostid
+          description: ID of the post
+          required: true
+          schema: 
+            type: string
+        - in: header
+          name: Bearer
+          schema: 
+            type: string
+            required: true
+      responses:
+        '200':
+          description: Get post comments by id
+          content: 
+            application/json:
+              schema:
+                type: array
+                $ref: '#components/schemas/Likes'
+
+
+
+     
+      
+
+
+components: 
+  schemas:
+    Signup:
+      title: Signup
+      required: 
+        - name
+        - email
+        - password
+      type: object
+      properties:
+        name:
+          type: string
+        email: 
+          type: string
+        password: 
+          type: string
+      example:
+        name: Test User
+        email: test@gmail.com
+        password: test123
+    SignupResponse:
+      type: object
+      properties: 
+        name:
+          type: string
+        email: 
+          type: string
+        token: 
+          type: string
+      example:
+        name: Test User
+        email: test@gmail.com
+        token: '143253256'
+    Login:
+      title: Login
+      required: 
+        - email
+        - password
+      type: object
+      properties:
+        email: 
+          type: string
+        password: 
+          type: string
+      example:
+        email: test@gmail.com
+        password: test123
+    LoginResponse:
+      type: object
+      properties:  
+        email: 
+          type: string
+        password: 
+          type: string
+      example:
+        email: test@gmail.com
+        password: test123@gmail.com
+        token: '143253256'
+    Post:
+      title: Post
+      required: 
+        - title
+        - content
+        - author
+      type: object
+      properties:
+        title: 
+          type: string
+        content: 
+          type: string
+        author:
+          type: string
+      example:
+        title: Sample title
+        content: Sample content
+        author: Fred 
+    Comments:
+      title: Comments
+      required: 
+        - user
+        - post
+        - content
+      type: object
+      properties:
+        user: 
+          type: string
+        post: 
+          type: string
+        content:
+          type: string
+      example:
+        user: Fred 
+        post: 6a4ga5w7ea4g5w5
+        content: Sample comment
+    Likes:
+      title: Likes
+      required: 
+        - user
+        - post
+      type: object
+      properties:
+        user: 
+          type: string
+        post: 
+          type: string
+      example:
+        user: Fred 
+        post: 6a4ga5w7ea4g5w5
+        likeCount: 5
+
+    
+
+

@@ -18,6 +18,7 @@ const userSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
   password: Joi.string().min(5),
+  role: Joi.string()
 });
 
 const loginSchema = Joi.object({
@@ -292,14 +293,14 @@ const makeUserAnAdmin = async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.userId))
       return res.status(400).json({ message: "Invalid blog id" });
     const user = await User.findOneAndUpdate(
-      { _id: userId },
+      { _id: req.params.userId },
       { $set: { role: "admin" } },
       { new: true }
     );
     await user.save();
     return res
       .status(200)
-      .json({ message: "successfully made" + user.name + "an admin" });
+      .json({ message: "successfully made " + user.name + " an admin" });
   } catch (err) {
     return res.status(200).json({ err: err.messae });
   }
