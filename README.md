@@ -7,7 +7,7 @@ Nodejs api with express and mongoose ORM
 To get started with this api follow the steps below
 
 ```shell
-$ git clone https://github.com/hakizimana-fred/Blog-app-api
+$ git clone https://github.com/hakizimana-fred/Andela-capstone-Api.git
 $ cd blog-api
 $ yarn install or npm install
 ```
@@ -31,3 +31,7 @@ $ yarn start or npm start
     MONGO_URI= "mongodb url"
 ```
 
+## Follow Me
+* [Linkedin](https://www.linkedin.com/in/hakifred/)
+* [Twitter](https://twitter.com/hakifred201)
+* [Github](https://github.com/hakizimana-fred)
