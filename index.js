@@ -24,8 +24,8 @@ const run = async () => {
     app.use(morgan("dev"));
     app.use(compression());
 
-    app.get("/", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
     app.use("/api", routes);
+    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
 
     app.listen(process.env.PORT, () => {
       console.log("Server has started!");
