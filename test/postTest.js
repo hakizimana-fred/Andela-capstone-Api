@@ -1,45 +1,23 @@
+const { expect } = require("chai");
 const chai = require("chai");
 const chaiHttp = require("chai-http");
 const server = require("../index");
 
 chai.use(chaiHttp);
 
-describe("POST API", function () {
-  it("should Register user, login user, check token and get posts", function (done) {
+describe("User Authentication", function () {
+  it("should Register user, login user", function (done) {
     chai
       .request(server)
-
       .post("/api/user/signup")
-
       .send({
-        name: "Test User",
-        email: "test@gmail.com",
+        name: "Fred",
+        email: "tester@gmail.com",
         password: "tester",
       })
       .end((err, res) => {
-        res.should.have.status(200);
-
-        // chai
-        //   .request(server)
-        //   .post("/api/user/login")
-        //   // send user login details
-        //   .send({
-        //     email: "test@gmail.com",
-        //     password: "tester",
-        //   })
-        //   .end((err, res) => {
-        //     res.body.should.have.property("user");
-        //     const token = res.body.user.token;
-
-        //     chai
-        //       .request(server)
-        //       .get("/api/posts")
-        //       .set("Authorization", `Bearer ${token}`)
-        //       .end((err, res) => {
-        //         res.should.have.status(200);
-        //         done();
-        //       });
-        //   });
+        expect(res.status).to.equal(200);
+        done()
       });
   });
 });

@@ -13,17 +13,21 @@ $ yarn install or npm install
 ```
 
 ## DATABASE
-* This Api  uses mongodb database.
-  * [ ] Have mongodb installe in your system or you can use mongodb clusters
-  * [ ] You don't need to worry about creating tables, mongoose will immediately create respective collections for you
-## START THE SERVER 
+
+- This Api uses mongodb database.
+  - [ ] Have mongodb installe in your system or you can use mongodb clusters
+  - [ ] You don't need to worry about creating tables, mongoose will immediately create respective collections for you
+
+## START THE SERVER
+
 ```shell
 $ yarn start or npm start
 
 ```
+
 ## ENVIRONMENT VARIABLES
 
-* Create **.env** file in the main directory and add the following
+- Create **.env** file in the main directory and add the following
 
 ```shell
     JWT_SECRET="JWT SECRET"
@@ -32,6 +36,7 @@ $ yarn start or npm start
 ```
 
 ## Follow Me
-* [Linkedin](https://www.linkedin.com/in/hakifred/)
-* [Twitter](https://twitter.com/hakifred201)
-* [Github](https://github.com/hakizimana-fred)
+
+- [Linkedin](https://www.linkedin.com/in/hakifred/)
+- [Twitter](https://twitter.com/hakifred201)
+- [Github](https://github.com/hakizimana-fred)

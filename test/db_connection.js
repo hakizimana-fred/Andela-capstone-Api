@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
-const DB_NAME = require("../constants/DB_CONNECTION");
+const DB_CONNECTION = require("../constants/DB_CONNECTION");
 mongoose.Promise = global.Promise;
 require("dotenv").config();
-const dbConnection = `${process.env.MONGO_URI}/${DB_NAME}`  
 
-mongoose.connect(dbConnection);
+console.log(DB_CONNECTION, "test");
 
+mongoose.connect(DB_CONNECTION);
 
 mongoose.connection
   .once("open", () => console.log("connected"))
