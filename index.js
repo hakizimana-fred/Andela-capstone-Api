@@ -23,7 +23,8 @@ const run = async () => {
     app.use(express.json());
     app.use(morgan("dev"));
     app.use(compression());
-    app.use("/", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
+
+    app.get("/", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
     app.use("/api", routes);
 
     app.listen(process.env.PORT, () => {
