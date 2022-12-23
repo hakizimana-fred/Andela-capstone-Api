@@ -26,7 +26,7 @@ const loginSchema = Joi.object({
   password: Joi.string().min(5),
 });
 
-const comment = Joi.object({
+const commentSchema = Joi.object({
   content: Joi.string().required(),
 });
 
@@ -36,7 +36,6 @@ const signupUser = async (req, res) => {
     const { error, value } = userSchema.validate(req.body);
 
     if (error) {
-      console.log(error);
       return res.send(error.details);
     }
     // find if User exists
@@ -185,10 +184,9 @@ const updatePost = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     await Post.deleteOne({ _id: req.params.id });
-    res.status(204).send();
-  } catch {
-    res.status(404);
-    res.send({ error: "Post doesn't exist!" });
+    return res.status(200).json({ message: "Deleted successfully" });
+  } catch (err) {
+    return res.status(404).json({ error: err.message });
   }
 };
 
@@ -291,7 +289,7 @@ const getLikes = async (req, res) => {
 const makeUserAnAdmin = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.userId))
-      return res.status(400).json({ message: "Invalid blog id" });
+      return res.status(400).json({ message: "Invalid User id" });
     const user = await User.findOneAndUpdate(
       { _id: req.params.userId },
       { $set: { role: "admin" } },

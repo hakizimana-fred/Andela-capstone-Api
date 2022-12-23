@@ -17,7 +17,7 @@ describe("User Authentication", function () {
       })
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        done()
+        done();
       });
   });
 });

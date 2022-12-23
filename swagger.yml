@@ -8,7 +8,7 @@ info:
   contact:
     email: hakifred20@gmail.com
 servers:
-  - url: http://127.0.0.1:5000/api/
+  - url: https://odd-teal-jellyfish-wig.cyclic.app/api/
 tags:
   - name: Blog API
     description: All Endpoints of the blog Api

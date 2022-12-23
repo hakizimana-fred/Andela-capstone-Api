@@ -8,9 +8,11 @@ const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
 const DB_CONNECTION = require("./constants/DB_CONNECTION");
 const apiDocumentation = YAML.load("./swagger.yml");
+const swaggerDocs = require("./swagger");
 
 dotenv.config();
 const app = express();
+
 const run = async () => {
   try {
     await mongoose.connect(DB_CONNECTION, {
@@ -20,15 +22,16 @@ const run = async () => {
 
     console.log("DB connected successfully");
 
+    /*Middlewares */
     app.use(express.json());
     app.use(morgan("dev"));
     app.use(compression());
-
     app.use("/api", routes);
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
 
     app.listen(process.env.PORT, () => {
       console.log("Server has started!");
+      swaggerDocs(app, process.env.PORT);
     });
   } catch (err) {
     console.log(err.message);
