@@ -6,6 +6,7 @@ const generateToken = require("../utils/generateToken");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
 const mongoose = require("mongoose");
+const generateTokens = require("../utils/generateToken");
 
 // Joi validation
 const postSchema = Joi.object({
@@ -50,7 +51,8 @@ const signupUser = async (req, res) => {
     const hashedPassword = await argon2.hash(req.body.password);
     newUser.password = hashedPassword;
     const savedUser = await newUser.save();
-    const token = generateToken(savedUser);
+
+    const { accessToken, refreshToken } = await generateTokens(savedUser)
 
     const userResponse = {
       id: savedUser._id,
@@ -62,7 +64,8 @@ const signupUser = async (req, res) => {
     return res.status(200).json({
       user: {
         ...userResponse,
-        token,
+        accessToken,
+        refreshToken
       },
     });
   } catch (err) {
@@ -86,7 +89,7 @@ const loginUser = async (req, res) => {
     );
 
     if (user && isValidPassword) {
-      const token = generateToken(user);
+      const { accessToken, refreshToken } = await generateTokens(user)
 
       const userResponse = {
         id: user._id,
@@ -97,7 +100,8 @@ const loginUser = async (req, res) => {
       return res.status(200).json({
         user: {
           ...userResponse,
-          token,
+          accessToken, 
+          refreshToken
         },
       });
     } else {
@@ -142,12 +146,12 @@ const savePost = async (req, res) => {
 
 const getSinglePost = async (req, res) => {
   try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({message: 'Invalid ID'})
     try {
       const post = await Post.findOne({ _id: req.params.id });
-      res.send(post);
-    } catch {
-      res.status(404);
-      res.send({ error: "Post doesn't exist!" });
+      res.status(200).json(post);
+    } catch(err) {
+      res.status(404).json({err: err.message})
     }
   } catch (err) {
     res.status(400).json({ msg: err.message });
@@ -159,9 +163,9 @@ const updatePost = async (req, res) => {
     const { error, value } = postSchema.validate(req.body);
 
     if (error) {
-      console.log(error);
-      return res.send(error.details);
+      return res.status(200).json({err: error.details})
     }
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({message: 'Invalid ID'})
 
     const post = await Post.findOne({ _id: req.params.id });
 
@@ -174,10 +178,9 @@ const updatePost = async (req, res) => {
     }
 
     await post.save();
-    res.send(post);
-  } catch {
-    res.status(404);
-    res.send({ error: "Post doesn't exist!" });
+    return res.status(200).json(post);
+  } catch(err) {
+    res.status(400).json({err: err.message})
   }
 };
 

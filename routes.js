@@ -196,21 +196,19 @@ router.get("/posts/:id", getSinglePost);
 
 /**
  * @swagger
- * /api/posts/{id}:
- *   patch:
- *     summary: Edit post
+ * '/api/posts/{id}':
+ *  post:
+ *     tags:
+ *     - Posts
+ *     summary: Edit a Post
  *     parameters:
- *      - name: postId
+ *      - name: blogId
  *        in: path
  *        required: true
- *        description: You must provide a blog Id
- *     tags:
- *      - Posts
  *     requestBody:
- *       description: please Fill the required fields
- *       required: true
- *       content:
- *         application/json:
+ *      required: true
+ *      content:
+ *        application/json:
  *           schema:
  *            type: object
  *            required:
@@ -220,13 +218,20 @@ router.get("/posts/:id", getSinglePost);
  *            properties:
  *              title:
  *                type: string
+ *                default: Sample Post
  *              content:
  *                type: string
+ *                default: New Post
  *              author:
  *                type: string
+ *                default: Fred
  *     responses:
- *       '200':
- *         description: Successfully Signup in
+ *      200:
+ *        description: Created
+ *      409:
+ *        description: Conflict
+ *      404:
+ *        description: Not Found
  */
 router.patch("/posts/:id", auth, authorize, updatePost);
 
@@ -389,5 +394,6 @@ router.post("/post/likes/:blogId", auth, postLike);
  *          description: not found
  */
 router.get("/get/likes/:blogId", auth, getLikes);
+
 
 module.exports = router;
