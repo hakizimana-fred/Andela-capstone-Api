@@ -2,14 +2,13 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const Joi = require("joi");
 const argon2 = require("argon2");
-const generateToken = require("../utils/generateToken");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
 const mongoose = require("mongoose");
 const generateTokens = require("../utils/generateToken");
-const verifyRefreshToken = require("../utils/verifyRefreshToken");
 const UserToken = require("../models/UserToken");
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { dbHistogram } = require("../utils/serverMetrics");
 
 // Joi validation
 const postSchema = Joi.object({
@@ -36,6 +35,10 @@ const commentSchema = Joi.object({
 
 // User Controller
 const signupUser = async (req, res) => {
+  const metricsLabel = {
+    operation: 'signupUser'
+  }
+  const timer = dbHistogram.startTimer()
   try {
     const { error, value } = userSchema.validate(req.body);
 
@@ -54,6 +57,7 @@ const signupUser = async (req, res) => {
     const hashedPassword = await argon2.hash(req.body.password);
     newUser.password = hashedPassword;
     const savedUser = await newUser.save();
+    timer({...metricsLabel, success: "true"})
 
     const { accessToken, refreshToken } = await generateTokens(savedUser)
 
@@ -72,7 +76,8 @@ const signupUser = async (req, res) => {
       },
     });
   } catch (err) {
-    return res.status(400).json({ err: err.message });
+    timer({...metricsLabel, success: false})
+    return res.status(400).json({ err: err.message })
   }
 };
 
