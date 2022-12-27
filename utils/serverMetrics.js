@@ -17,7 +17,6 @@ const dbHistogram = new client.Histogram({
 
 const startMetrics = () => {
     const collectDefaultMetrics = client.collectDefaultMetrics
-
     collectDefaultMetrics()
 
     app.get('/metrics', async (req, res) => {

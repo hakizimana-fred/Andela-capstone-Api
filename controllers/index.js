@@ -124,13 +124,17 @@ const loginUser = async (req, res) => {
 const getPosts = async (req, res) => {
   try {
     const posts = await Post.find();
-    res.send(posts);
+    res.status(200).json(posts);
   } catch (err) {
     return res.send(400).json({ msg: err.message });
   }
 };
 
 const savePost = async (req, res) => {
+   const metricsLabel = {
+    operation: 'savePost'
+  }
+  const timer = dbHistogram.startTimer()
   try {
     const { error, value } = postSchema.validate(req.body);
 
@@ -146,9 +150,12 @@ const savePost = async (req, res) => {
     });
 
     await post.save();
-    res.send(post);
+    timer({...metricsLabel, success: "true"})
+
+    res.status(200).json(post);
   } catch (err) {
-    res.send(err.message);
+    timer({...metricsLabel, success: "false"})
+    return res.status(400).json({err: err.message});
   }
 };
 
@@ -204,6 +211,10 @@ const deletePost = async (req, res) => {
 // post Comment
 
 const postComment = async (req, res) => {
+    const metricsLabel = {
+    operation: 'postComment'
+  }
+  const timer = dbHistogram.startTimer()
   try {
     if (!mongoose.isValidObjectId(req.params.blogId))
       return res.status(400).json({ message: "Invalid blog id" });
@@ -220,11 +231,13 @@ const postComment = async (req, res) => {
         username: userFound.name,
       });
       await comment.save();
+      timer({...metricsLabel, success: "true"})
       return res.status(201).json(comment);
     } else {
       return res.status(200).json({ message: "Something went wrong" });
     }
   } catch (err) {
+      timer({...metricsLabel, success: "false"})
     return res.status(201).json({ err: err.message });
   }
 };
