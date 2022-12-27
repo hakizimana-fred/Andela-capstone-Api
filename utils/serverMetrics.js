@@ -3,6 +3,12 @@ const client = require('prom-client')
 
 const app = express()
 
+const restApiHistogram = new client.Histogram({
+    name: "rest_response_time_duration_seconds",
+    help: "REST API response time in seconds",
+    labelNames: ["method", "route", "status_code"],
+})
+
 const startMetrics = () => {
     const collectDefaultMetrics = client.collectDefaultMetrics
 
@@ -18,5 +24,6 @@ const startMetrics = () => {
 }
 
 module.exports = {
-    startMetrics
+    startMetrics,
+    restApiHistogram
 }
