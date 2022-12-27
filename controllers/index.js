@@ -7,6 +7,9 @@ const Comment = require("../models/Comment");
 const Like = require("../models/Like");
 const mongoose = require("mongoose");
 const generateTokens = require("../utils/generateToken");
+const verifyRefreshToken = require("../utils/verifyRefreshToken");
+const UserToken = require("../models/UserToken");
+const jwt = require('jsonwebtoken')
 
 // Joi validation
 const postSchema = Joi.object({
@@ -307,6 +310,23 @@ const makeUserAnAdmin = async (req, res) => {
   }
 };
 
+const createRefreshToken = (req, res) => {
+  const refreshToken = req.body.token
+   try {
+     const token = UserToken.findOne({token: refreshToken})
+      if (!token) return res.status(403).json({err: true, message: "Invalid token"})
+      const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH)
+      const accessToken = jwt.sign({
+        id: payload.id,
+        email: payload.email
+      }, process.env.JWT_SECRET, { expiresIn: '15m'})
+      return res.status(200).json({error: false, accessToken})
+   }catch(err) {
+    return res.status(400).json({err: err.message})
+   }
+
+}
+
 module.exports = {
   signupUser,
   loginUser,
@@ -320,4 +340,5 @@ module.exports = {
   postLike,
   getLikes,
   makeUserAnAdmin,
+  createRefreshToken
 };

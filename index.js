@@ -9,6 +9,7 @@ const YAML = require("yamljs");
 const DB_CONNECTION = require("./constants/DB_CONNECTION");
 const apiDocumentation = YAML.load("./swagger.yml");
 const swaggerDocs = require("./swagger");
+const { startMetrics } = require("./utils/serverMetrics");
 
 dotenv.config();
 const app = express();
@@ -31,6 +32,7 @@ const run = async () => {
 
     app.listen(process.env.PORT, () => {
       console.log("Server has started!");
+      startMetrics()
       swaggerDocs(app, process.env.PORT);
     });
   } catch (err) {

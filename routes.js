@@ -13,6 +13,7 @@ const {
   postLike,
   getLikes,
   makeUserAnAdmin,
+  createRefreshToken
 } = require("./controllers");
 
 const router = express.Router();
@@ -394,6 +395,8 @@ router.post("/post/likes/:blogId", auth, postLike);
  *          description: not found
  */
 router.get("/get/likes/:blogId", auth, getLikes);
+router.post('/refresh-token', createRefreshToken)
 
+router.post('/refresh-token', createRefreshToken)
 
 module.exports = router;
