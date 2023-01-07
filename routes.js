@@ -1,5 +1,6 @@
 const express = require("express");
 const { authorize, auth } = require("./utils/authorize");
+
 const {
   getPosts,
   savePost,
@@ -13,7 +14,8 @@ const {
   postLike,
   getLikes,
   makeUserAnAdmin,
-  createRefreshToken
+  createAccessToken,
+  createMessage
 } = require("./controllers");
 
 const router = express.Router();
@@ -395,8 +397,7 @@ router.post("/post/likes/:blogId", auth, postLike);
  *          description: not found
  */
 router.get("/get/likes/:blogId", auth, getLikes);
-router.post('/refresh-token', createRefreshToken)
-
-router.post('/refresh-token', createRefreshToken)
+router.post('/create-refresh-token', auth, createAccessToken)
+router.post('/create-message', auth, createMessage)
 
 module.exports = router;

@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const generateTokens = require("../utils/generateToken");
 const UserToken = require("../models/UserToken");
 const jwt = require('jsonwebtoken');
+const Message = require('../models/Message')
 const { dbHistogram } = require("../utils/serverMetrics");
 
 // Joi validation
@@ -31,6 +32,13 @@ const loginSchema = Joi.object({
 
 const commentSchema = Joi.object({
   content: Joi.string().required(),
+});
+
+const messageSchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  message: Joi.string().required(),
+  user: Joi.string().required(),
 });
 
 // User Controller
@@ -173,6 +181,7 @@ const getSinglePost = async (req, res) => {
   }
 };
 
+// update post controller
 const updatePost = async (req, res) => {
   try {
     const { error, value } = postSchema.validate(req.body);
@@ -328,21 +337,53 @@ const makeUserAnAdmin = async (req, res) => {
   }
 };
 
-const createRefreshToken = (req, res) => {
+
+
+const createAccessToken = async (req, res) => {
   const refreshToken = req.body.token
+  if (!refreshToken) return res.status(400).json({success: false, message: "refresh token must be provided"})
    try {
-     const token = UserToken.findOne({token: refreshToken})
-      if (!token) return res.status(403).json({err: true, message: "Invalid token"})
+     const token = await UserToken.findOne({token: refreshToken})
+      if (!token) return res.status(403).json({err: false, message: "Refresh token not found in DB"})
       const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH)
       const accessToken = jwt.sign({
         id: payload.id,
         email: payload.email
       }, process.env.JWT_SECRET, { expiresIn: '15m'})
-      return res.status(200).json({error: false, accessToken})
+      return res.status(200).json({success: true, accessToken})
    }catch(err) {
     return res.status(400).json({err: err.message})
    }
+}
 
+// create message controller
+const createMessage = async (req, res) => {
+  const body = {
+    name: req.body.name,
+    email: req.body.email,
+    message: req.body.message,
+    user: req.user
+  }
+
+   const { error, value } = messageSchema.validate(body);
+
+    if (error) {
+      return res.send(error.details);
+    }
+
+  const { name, email, message} = req.body
+  try {
+    const newMessage = new Message({
+      name,
+      email,
+      message,
+      user: req.user
+    })
+    const savedMessage = await newMessage.save()
+    return res.status(200).json(savedMessage)
+  }catch(e) {
+    return res.status(400).json({err: e.message})
+  }
 }
 
 module.exports = {
@@ -358,5 +399,6 @@ module.exports = {
   postLike,
   getLikes,
   makeUserAnAdmin,
-  createRefreshToken
+  createAccessToken,
+  createMessage
 };
