@@ -15,7 +15,8 @@ const {
   getLikes,
   makeUserAnAdmin,
   createAccessToken,
-  createMessage
+  createMessage,
+  getMessages
 } = require("./controllers");
 
 const router = express.Router();
@@ -200,7 +201,7 @@ router.get("/posts/:id", getSinglePost);
 /**
  * @swagger
  * '/api/posts/{id}':
- *  post:
+ *  patch:
  *     tags:
  *     - Posts
  *     summary: Edit a Post
@@ -397,7 +398,96 @@ router.post("/post/likes/:blogId", auth, postLike);
  *          description: not found
  */
 router.get("/get/likes/:blogId", auth, getLikes);
+/* Post Comments */
+/**
+ * @swagger
+ * '/api/create-refresh-token':
+ *  post:
+ *     tags:
+ *     - Refresh Token
+ *     summary: Create access token from refresh token
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - token
+ *            properties:
+ *              token:
+ *                type: string
+ *     responses:
+ *      200:
+ *        description: Created
+ *      409:
+ *        description: Conflict
+ *      404:
+ *        description: Not Found
+ */
 router.post('/create-refresh-token', auth, createAccessToken)
+
+/* Post Message */
+/**
+ * @swagger
+ * '/api/create-message':
+ *  post:
+ *     tags:
+ *     - Messages
+ *     summary: Create A message
+ *     requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *           schema:
+ *            type: object
+ *            required:
+ *              - name
+ *              - email
+ *              - message
+ *            properties:
+ *              name:
+ *                type: string
+ *              email:
+ *                type: string
+ *              message:
+ *                type: string
+ *     responses:
+ *      200:
+ *        description: Created
+ *      409:
+ *        description: Conflict
+ *      404:
+ *        description: Not Found
+ */
 router.post('/create-message', auth, createMessage)
+
+/**
+ * @swagger
+ * /api/get-messages:
+ *    get:
+ *      tags:
+ *      - Messages:
+ *      summary: Get Messages
+ *      responses:
+ *        200:
+ *          description: success
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: array
+ *                items:
+ *                  type: object
+ *              properties:
+ *                name:
+ *                  type: string
+ *                email:
+ *                  type: string
+ *                message:
+ *                  type: string
+ *        404:
+ *          description: not found
+ */
+router.get('/get-messages', auth, authorize, getMessages)
 
 module.exports = router;

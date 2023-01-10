@@ -1,8 +1,8 @@
+require('dotenv').config()
 const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
 const morgan = require("morgan");
-const dotenv = require("dotenv");
 const compression = require("compression");
 const swaggerUi = require("swagger-ui-express");
 const YAML = require("yamljs");
@@ -12,7 +12,6 @@ const swaggerDocs = require("./swagger");
 const { startMetrics, restApiHistogram } = require("./utils/serverMetrics");
 const responseTime = require('response-time')
 
-dotenv.config();
 const app = express();
 
 const run = async () => {
@@ -23,7 +22,6 @@ const run = async () => {
     });
 
     console.log("DB connected successfully");
-
     /*Middlewares */
     app.use(express.json());
 
@@ -40,12 +38,12 @@ const run = async () => {
       }
     }))
     
+    // Application middlewares
     app.use(morgan("dev"));
     app.use(compression());
     app.use("/api", routes);
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(apiDocumentation));
-
-
+    // 
     app.listen(process.env.PORT, () => {
       console.log("Server has started!");
       startMetrics()

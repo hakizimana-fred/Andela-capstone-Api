@@ -338,7 +338,7 @@ const makeUserAnAdmin = async (req, res) => {
 };
 
 
-
+// this controller derives access token from fresh token
 const createAccessToken = async (req, res) => {
   const refreshToken = req.body.token
   if (!refreshToken) return res.status(400).json({success: false, message: "refresh token must be provided"})
@@ -386,6 +386,19 @@ const createMessage = async (req, res) => {
   }
 }
 
+// get saved message controller
+const getMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({})
+    return res.status(200).json(messages)
+
+  }catch(e) {
+    return res.status(400).json({err: e.message})
+  }
+}
+
+
+
 module.exports = {
   signupUser,
   loginUser,
@@ -400,5 +413,6 @@ module.exports = {
   getLikes,
   makeUserAnAdmin,
   createAccessToken,
-  createMessage
+  createMessage,
+  getMessages
 };
