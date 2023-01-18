@@ -14,6 +14,10 @@ const schema = mongoose.Schema(
       type: String,
       required: true,
     },
+    imgUrl: {
+      type: String,
+      required: true
+    }
   },
   { timestamps: true }
 );

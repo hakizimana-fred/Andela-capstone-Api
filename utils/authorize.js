@@ -10,10 +10,10 @@ const auth = (req, res, next) => {
       req.user = payload.id;
       next();
     } catch (err) {
-      return res.status(401).json({ message: "Invalid token" });
+      return res.status(401).json({status: false, message: "Invalid token" });
     }
   } else {
-    return res.status(401).json({ message: "No token" });
+    return res.status(401).json({status: false, message: "No token was provided" });
   }
 };
 

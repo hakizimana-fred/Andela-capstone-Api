@@ -16,6 +16,7 @@ const postSchema = Joi.object({
   title: Joi.string().required(),
   author: Joi.string().min(4).required(),
   content: Joi.string().min(5).required(),
+  imgUrl: Joi.string().min(5).required(),
 });
 
 const userSchema = Joi.object({
@@ -91,11 +92,12 @@ const signupUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { error, value } = loginSchema.validate(req.body);
+    // const { error, value } = loginSchema.validate(req.body);
 
-    if (error) {
-      return res.send(error.details);
-    }
+    // if (error) {
+    //   return res.send(error.details);
+    // }
+    console.log(req.body)
 
     // find if User exists and password is valid
     const user = await User.findOne({ email: req.body.email });
@@ -114,17 +116,17 @@ const loginUser = async (req, res) => {
         role: user.role,
       };
       return res.status(200).json({
+        success: true,
         user: {
-          ...userResponse,
           accessToken, 
           refreshToken
         },
       });
     } else {
-      return res.status(400).json({ message: "Invalid credentials" });
+      return res.status(400).json({success: false, message: "Invalid credentials" });
     }
   } catch (err) {
-    return res.status(400).json({ message: "Invalid credentials" });
+    return res.status(400).json({ error: err.message });
   }
 };
 
@@ -132,9 +134,9 @@ const loginUser = async (req, res) => {
 const getPosts = async (req, res) => {
   try {
     const posts = await Post.find();
-    res.status(200).json(posts);
+    res.status(200).json({success: true, posts});
   } catch (err) {
-    return res.send(400).json({ msg: err.message });
+    return res.send(400).json({success: false, message:err.message });
   }
 };
 
@@ -144,7 +146,9 @@ const savePost = async (req, res) => {
   }
   const timer = dbHistogram.startTimer()
   try {
+    
     const { error, value } = postSchema.validate(req.body);
+
 
     if (error) {
       console.log(error);
@@ -155,9 +159,11 @@ const savePost = async (req, res) => {
       title: req.body.title,
       content: req.body.content,
       author: req.body.author,
+      imgUrl: req.body.imgUrl
     });
 
     await post.save();
+    console.log('just post', post)
     timer({...metricsLabel, success: "true"})
 
     res.status(200).json(post);
@@ -201,10 +207,14 @@ const updatePost = async (req, res) => {
       post.content = req.body.content;
     }
 
+    if (req.body.imgUrl) {
+      post.imgUrl = req.body.imgUrl
+    }
+
     await post.save();
-    return res.status(200).json(post);
+    return res.status(200).json({success: true, post});
   } catch(err) {
-    res.status(400).json({err: err.message})
+    res.status(400).json({success: false, err: err.message})
   }
 };
 

@@ -11,6 +11,7 @@ const apiDocumentation = YAML.load("./swagger.yml");
 const swaggerDocs = require("./swagger");
 const { startMetrics, restApiHistogram } = require("./utils/serverMetrics");
 const responseTime = require('response-time')
+const cors = require('cors')
 
 const app = express();
 
@@ -23,7 +24,8 @@ const run = async () => {
 
     console.log("DB connected successfully");
     /*Middlewares */
-    app.use(express.json());
+    app.use(express.json({limit: '100mb'}));
+    app.use(express.urlencoded({etended: false}))
 
     app.use(responseTime((req, res, time) => {
       if (req?.route?.path) {
@@ -39,6 +41,7 @@ const run = async () => {
     }))
     
     // Application middlewares
+    app.use(cors({origin: '*'}))
     app.use(morgan("dev"));
     app.use(compression());
     app.use("/api", routes);

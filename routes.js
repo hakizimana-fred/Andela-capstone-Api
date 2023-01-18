@@ -196,7 +196,7 @@ router.post("/posts", auth, authorize, savePost);
  *          description: not found
  */
 
-router.get("/posts/:id", getSinglePost);
+router.get("/posts/:id", auth, getSinglePost);
 
 /**
  * @swagger
