@@ -1,5 +1,6 @@
-const express = require("express");
-const { authorize, auth } = require("./utils/authorize");
+const express = require('express');
+const { authorize, auth } = require('./utils/authorize');
+
 
 const {
   getPosts,
@@ -16,10 +17,15 @@ const {
   makeUserAnAdmin,
   createAccessToken,
   createMessage,
-  getMessages
-} = require("./controllers");
+  getMessages,
+  fetchUsers,
+  fetchPosts,
+  fetchMessages,
+} = require('./controllers');
+
 
 const router = express.Router();
+
 
 /**
  * @swagger
@@ -52,7 +58,7 @@ const router = express.Router();
  *       '200':
  *         description: Successfully Signup in
  */
-router.post("/user/signup", signupUser);
+router.post('/user/signup', signupUser);
 
 /**
  * @swagger
@@ -82,7 +88,7 @@ router.post("/user/signup", signupUser);
  *       '200':
  *         description: Successfully Logged in
  */
-router.post("/user/login", loginUser);
+router.post('/user/login', loginUser);
 
 /**
  * @swagger
@@ -99,7 +105,7 @@ router.post("/user/login", loginUser);
  *       '200':
  *         description: successfully made a user an admin
  */
-router.post("/user/make-admin/:userId", auth, authorize, makeUserAnAdmin);
+router.post('/user/make-admin/:userId', auth, authorize, makeUserAnAdmin);
 
 /**
  * @swagger
@@ -127,7 +133,7 @@ router.post("/user/make-admin/:userId", auth, authorize, makeUserAnAdmin);
  *       400:
  *         description: Bad request
  */
-router.get("/posts", auth, getPosts);
+router.get('/posts', auth, getPosts);
 
 /**
  * @swagger
@@ -165,7 +171,7 @@ router.get("/posts", auth, getPosts);
  *        description: Not Found
  */
 
-router.post("/posts", auth, authorize, savePost);
+router.post('/posts', auth, authorize, savePost);
 /**
  * @swagger
  * /api/posts/{blogId}:
@@ -196,7 +202,7 @@ router.post("/posts", auth, authorize, savePost);
  *          description: not found
  */
 
-router.get("/posts/:id", auth, getSinglePost);
+router.get('/posts/:id', auth, getSinglePost);
 
 /**
  * @swagger
@@ -237,7 +243,7 @@ router.get("/posts/:id", auth, getSinglePost);
  *      404:
  *        description: Not Found
  */
-router.patch("/posts/:id", auth, authorize, updatePost);
+router.patch('/posts/:id', auth, authorize, updatePost);
 
 /**
  * @swagger
@@ -264,7 +270,7 @@ router.patch("/posts/:id", auth, authorize, updatePost);
  *        404:
  *          description: not found
  */
-router.delete("/posts/:id", auth, authorize, deletePost);
+router.delete('/posts/:id', auth, authorize, deletePost);
 
 /**
  * @swagger
@@ -297,7 +303,7 @@ router.delete("/posts/:id", auth, authorize, deletePost);
  *       400:
  *         description: Bad request
  */
-router.get("/post/comments/:blogId", auth, getComments);
+router.get('/post/comments/:blogId', auth, getComments);
 /* Post Comments */
 /**
  * @swagger
@@ -331,7 +337,7 @@ router.get("/post/comments/:blogId", auth, getComments);
  *        description: Not Found
  */
 
-router.post("/post/comments/:blogId", auth, postComment);
+router.post('/post/comments/:blogId', auth, postComment);
 /* Post likes */
 /**
  * @swagger
@@ -363,7 +369,7 @@ router.post("/post/comments/:blogId", auth, postComment);
  *          description: not found
  */
 
-router.post("/post/likes/:blogId", auth, postLike);
+router.post('/post/likes/:blogId', auth, postLike);
 /* Get likes */
 
 /**
@@ -397,7 +403,7 @@ router.post("/post/likes/:blogId", auth, postLike);
  *        404:
  *          description: not found
  */
-router.get("/get/likes/:blogId", auth, getLikes);
+router.get('/get/likes/:blogId', auth, getLikes);
 /* Post Comments */
 /**
  * @swagger
@@ -425,7 +431,7 @@ router.get("/get/likes/:blogId", auth, getLikes);
  *      404:
  *        description: Not Found
  */
-router.post('/create-refresh-token', auth, createAccessToken)
+router.post('/create-refresh-token', auth, createAccessToken);
 
 /* Post Message */
 /**
@@ -460,7 +466,7 @@ router.post('/create-refresh-token', auth, createAccessToken)
  *      404:
  *        description: Not Found
  */
-router.post('/create-message', auth, createMessage)
+router.post('/create-message', auth, createMessage);
 
 /**
  * @swagger
@@ -488,6 +494,11 @@ router.post('/create-message', auth, createMessage)
  *        404:
  *          description: not found
  */
-router.get('/get-messages', auth, authorize, getMessages)
+router.get('/get-messages', auth, authorize, getMessages);
+
+router.get('/users-count', auth, authorize, fetchUsers)
+router.get('/posts-count', auth, authorize, fetchPosts)
+router.get('/message-count', auth, authorize, fetchMessages)
+
 
 module.exports = router;

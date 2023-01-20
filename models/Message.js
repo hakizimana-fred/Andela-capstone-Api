@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+
 
 const messageSchema = mongoose.Schema(
   {
@@ -15,11 +16,12 @@ const messageSchema = mongoose.Schema(
       required: true,
     },
     user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Message", messageSchema);
+
+module.exports = mongoose.model('Message', messageSchema);

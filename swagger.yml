@@ -20,19 +20,19 @@ paths:
       summary: New User Registration process
       description: Register a new user if he's not already registered
       requestBody:
-        description: ""
+        description: ''
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Signup"
+              $ref: '#/components/schemas/Signup'
         required: true
       responses:
-        "200":
-          description: "User Registered Successfully"
+        '200':
+          description: 'User Registered Successfully'
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/SignupResponse"
+                $ref: '#components/schemas/SignupResponse'
   /user/login:
     post:
       tags:
@@ -43,15 +43,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Login"
+              $ref: '#components/schemas/Login'
         required: true
       responses:
-        "200":
-          description: "User logged in successfully"
+        '200':
+          description: 'User logged in successfully'
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/LoginResponse"
+                $ref: '#components/schemas/LoginResponse'
   /posts:
     post:
       tags:
@@ -68,7 +68,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Post"
+              $ref: '#components/schemas/Post'
         required: true
     get:
       tags:
@@ -82,14 +82,14 @@ paths:
             type: string
             required: true
       responses:
-        "200":
-          description: "Fetched posts successfully"
+        '200':
+          description: 'Fetched posts successfully'
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Post"
+                  $ref: '#components/schemas/Post'
   /posts/{postId}:
     get:
       tags:
@@ -111,12 +111,12 @@ paths:
             required: true
 
       responses:
-        "200":
+        '200':
           description: Fetched post by id
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Post"
+                $ref: '#components/schemas/Post'
     put:
       tags:
         - Post
@@ -137,12 +137,12 @@ paths:
             required: true
 
       responses:
-        "200":
+        '200':
           description: Update post by id
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Post"
+                $ref: '#components/schemas/Post'
     delete:
       tags:
         - Post
@@ -162,12 +162,12 @@ paths:
             type: string
             required: true
       responses:
-        "200":
+        '200':
           description: Update post by id
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Post"
+                $ref: '#components/schemas/Post'
   /post/comments/{postId}:
     get:
       tags:
@@ -188,14 +188,14 @@ paths:
             type: string
             required: true
       responses:
-        "200":
+        '200':
           description: Get post comments by id
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Comments"
+                  $ref: '#components/schemas/Comments'
     post:
       tags:
         - Comments
@@ -214,12 +214,12 @@ paths:
             type: string
             required: true
       responses:
-        "200":
+        '200':
           description: Get post comments by id
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Comments"
+                $ref: '#components/schemas/Comments'
   /post/likes/{postId}:
     post:
       tags:
@@ -239,12 +239,12 @@ paths:
             type: string
             required: true
       responses:
-        "200":
+        '200':
           description: Get post comments by id
           content:
             application/json:
               schema:
-                $ref: "#components/schemas/Likes"
+                $ref: '#components/schemas/Likes'
     get:
       tags:
         - Likes
@@ -263,13 +263,13 @@ paths:
             type: string
             required: true
       responses:
-        "200":
+        '200':
           description: Get post comments by id
           content:
             application/json:
               schema:
                 type: array
-                $ref: "#components/schemas/Likes"
+                $ref: '#components/schemas/Likes'
 
 components:
   schemas:
@@ -303,7 +303,7 @@ components:
       example:
         name: Test User
         email: test@gmail.com
-        token: "143253256"
+        token: '143253256'
     Login:
       title: Login
       required:
@@ -328,7 +328,7 @@ components:
       example:
         email: test@gmail.com
         password: test123@gmail.com
-        token: "143253256"
+        token: '143253256'
     Post:
       title: Post
       required:

@@ -1,4 +1,5 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
+
 
 const schema = mongoose.Schema(
   {
@@ -16,10 +17,11 @@ const schema = mongoose.Schema(
     },
     imgUrl: {
       type: String,
-      required: true
-    }
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Post", schema);
+
+module.exports = mongoose.model('Post', schema);

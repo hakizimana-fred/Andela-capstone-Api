@@ -1,15 +1,18 @@
+const mongoose = require("mongoose");
 const Post = require("../models/Post");
 const User = require("../models/User");
 const Joi = require("joi");
 const argon2 = require("argon2");
 const Comment = require("../models/Comment");
 const Like = require("../models/Like");
-const mongoose = require("mongoose");
 const generateTokens = require("../utils/generateToken");
 const UserToken = require("../models/UserToken");
 const jwt = require('jsonwebtoken');
 const Message = require('../models/Message')
-const { dbHistogram } = require("../utils/serverMetrics");
+const { 
+  dbHistogram 
+} = require("../utils/serverMetrics");
+
 
 // Joi validation
 const postSchema = Joi.object({
@@ -19,6 +22,8 @@ const postSchema = Joi.object({
   imgUrl: Joi.string().min(5).required(),
 });
 
+
+
 const userSchema = Joi.object({
   name: Joi.string().required(),
   email: Joi.string().email().required(),
@@ -26,14 +31,20 @@ const userSchema = Joi.object({
   role: Joi.string(),
 });
 
+
+
+
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().min(5),
 });
 
+
+
 const commentSchema = Joi.object({
   content: Joi.string().required(),
 });
+
 
 const messageSchema = Joi.object({
   name: Joi.string().required(),
@@ -41,6 +52,7 @@ const messageSchema = Joi.object({
   message: Joi.string().required(),
   user: Joi.string().required(),
 });
+
 
 // User Controller
 const signupUser = async (req, res) => {
@@ -90,15 +102,14 @@ const signupUser = async (req, res) => {
   }
 };
 
+
 const loginUser = async (req, res) => {
   try {
-    // const { error, value } = loginSchema.validate(req.body);
+    const { error, value } = loginSchema.validate(req.body);
 
-    // if (error) {
-    //   return res.send(error.details);
-    // }
-    console.log(req.body)
-
+    if (error) {
+      return res.send(error.details);
+    }
     // find if User exists and password is valid
     const user = await User.findOne({ email: req.body.email });
     const isValidPassword = await argon2.verify(
@@ -109,12 +120,6 @@ const loginUser = async (req, res) => {
     if (user && isValidPassword) {
       const { accessToken, refreshToken } = await generateTokens(user)
 
-      const userResponse = {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      };
       return res.status(200).json({
         success: true,
         user: {
@@ -130,6 +135,7 @@ const loginUser = async (req, res) => {
   }
 };
 
+
 // Post controller
 const getPosts = async (req, res) => {
   try {
@@ -139,6 +145,7 @@ const getPosts = async (req, res) => {
     return res.send(400).json({success: false, message:err.message });
   }
 };
+
 
 const savePost = async (req, res) => {
    const metricsLabel = {
@@ -173,6 +180,7 @@ const savePost = async (req, res) => {
   }
 };
 
+
 const getSinglePost = async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({message: 'Invalid ID'})
@@ -186,6 +194,7 @@ const getSinglePost = async (req, res) => {
     res.status(400).json({ msg: err.message });
   }
 };
+
 
 // update post controller
 const updatePost = async (req, res) => {
@@ -218,6 +227,7 @@ const updatePost = async (req, res) => {
   }
 };
 
+
 const deletePost = async (req, res) => {
   try {
     await Post.deleteOne({ _id: req.params.id });
@@ -227,8 +237,8 @@ const deletePost = async (req, res) => {
   }
 };
 
-// post Comment
 
+// post Comment
 const postComment = async (req, res) => {
     const metricsLabel = {
     operation: 'postComment'
@@ -261,6 +271,7 @@ const postComment = async (req, res) => {
   }
 };
 
+
 const getComments = async (req, res) => {
   try {
     // have to retrive the user and blog associated to the comment
@@ -276,44 +287,41 @@ const getComments = async (req, res) => {
   }
 };
 
+
 const postLike = async (req, res) => {
   try {
-    if (!mongoose.isValidObjectId(req.params.blogId))
-      return res.status(400).json({ message: "Invalid blog id" });
-    const blogFound = await Post.findById(req.params.blogId);
-    if (!blogFound) return res.status(400).json({ message: "No blog found" });
+    // if (!mongoose.isValidObjectId(req.params.blogId))
+    //   return res.status(400).json({ message: "Invalid blog id" });
+    // const blogFound = await Post.findById(req.params.blogId);
+    // if (!blogFound) return res.status(400).json({ message: "No blog found" });
+
     const user = req.user;
     // check if we're not liking for the second time
-    const liked = await Like.findOne({ user });
+    const liked = await Like.findOne({user})
     if (liked) {
-      return res.status(400).json({ message: "you cannot like twice" });
-    } else {
-      const newLike = new Like({
-        user,
-        post: req.params.blogId,
-      });
-      // check if likes already has a count of greather than 0
-      const likedPost = await Like.findOne({ post: req.params.blogId });
-      if (likedPost && likedPost.likeCount > 0) {
-        // updated
-        const doc = await Like.findOneAndUpdate(
-          { _id: likedPost._id },
-          { $set: { likeCount: (likedPost.likeCount += 1) } },
+       const doc = await Like.findOneAndUpdate(
+          { _id: liked._id },
+          { $set: { likeCount: (liked.likeCount = 1) } },
           { new: true }
         );
+
         await doc.save();
-        return res.status(200).json(doc);
-      } else {
-        newLike.likeCount++;
-        // save like
-        await newLike.save();
-        return res.status(200).json(newLike);
-      }
-    }
+        return res.status(200).json({success: true, doc})
+    }else {
+      const newLike =  new Like({
+        user,
+        post: req.params.blogId
+      })
+       // check if like count > 0 
+      newLike.likeCount = 1
+      await newLike.save();
+      return res.status(200).json({success: true, newLike})
+    } 
   } catch (err) {
     console.log(err);
   }
 };
+
 
 const getLikes = async (req, res) => {
   try {
@@ -328,6 +336,7 @@ const getLikes = async (req, res) => {
     return res.status(400).json({ err: err.message });
   }
 };
+
 
 const makeUserAnAdmin = async (req, res) => {
   try {
@@ -366,6 +375,7 @@ const createAccessToken = async (req, res) => {
    }
 }
 
+
 // create message controller
 const createMessage = async (req, res) => {
   const body = {
@@ -396,6 +406,7 @@ const createMessage = async (req, res) => {
   }
 }
 
+
 // get saved message controller
 const getMessages = async (req, res) => {
   try {
@@ -408,21 +419,89 @@ const getMessages = async (req, res) => {
 }
 
 
+// Fetch all users
+const fetchUsers = async (req, res) => {
+  try {
+    const users = await User.find({})
+    if (users.length > 0) return res.status(200).json({success: true, usersCount: users.length})
+  }catch(err){
+    return res.status(400).json({success: false, error: err.message})
+  }
+}
+
+
+// Fetch all users
+const fetchPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({})
+    if (posts.length > 0) return res.status(200).json({success: true, postCount: posts.length})
+  }catch(err){
+    return res.status(400).json({success: false, error: err.message})
+  }
+}
+
+const fetchMessages = async (req, res) => {
+  try {
+    const messages = await Message.find({})
+    if (messages.length > 0) return res.status(200).json({success: true, messageCount: messages.length})
+  }catch(err){
+    return res.status(400).json({success: false, error: err.message})
+  }
+}
 
 module.exports = {
+
+
   signupUser,
+
+
   loginUser,
+
+
   getPosts,
+
+
   savePost,
+
+
   getSinglePost,
+
+
   updatePost,
+
+
   deletePost,
+
+
   postComment,
+
+
   getComments,
+
+
   postLike,
+
+
   getLikes,
+
+
   makeUserAnAdmin,
+
+
   createAccessToken,
+
+
   createMessage,
-  getMessages
+
+
+  getMessages,
+
+
+  fetchPosts, 
+
+
+  fetchUsers,
+
+  fetchMessages
+
 };

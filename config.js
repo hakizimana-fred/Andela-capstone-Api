@@ -1,1 +1,1 @@
-require("jest-automock");
+require('jest-automock');
