@@ -296,29 +296,39 @@ const postLike = async (req, res) => {
     // if (!blogFound) return res.status(400).json({ message: "No blog found" });
 
     const user = req.user;
-    // check if we're not liking for the second time
-    const liked = await Like.findOne({user})
-    if (liked) {
-       const doc = await Like.findOneAndUpdate(
-          { _id: liked._id },
-          { $set: { likeCount: (liked.likeCount = 1) } },
+    const post = await Like.findOne({post: req.params.blogId})
+    //if no post
+    if (!post) {
+        const newLikedPost = new Like({
+          user, 
+          post: req.params.blogId
+        })
+        newLikedPost.likeCount += 1
+        await newLikedPost.save()
+        return res.status(200).json({success: true, doc: newLikedPost})
+    }else if (post) {
+        // check post and if user already like do a dislike
+        if (post.user == user) {
+           const doc = await Like.findOneAndUpdate(
+          { _id: post._id },
+          { $set: { likeCount: (post.likeCount -= 1), user: post.user = null } },
           { new: true }
         );
-
-        await doc.save();
-        return res.status(200).json({success: true, doc})
-    }else {
-      const newLike =  new Like({
-        user,
-        post: req.params.blogId
-      })
-       // check if like count > 0 
-      newLike.likeCount = 1
-      await newLike.save();
-      return res.status(200).json({success: true, newLike})
-    } 
+          await doc.save();
+          return res.status(200).json({success: true, doc})
+       }else {
+          const doc = await Like.findOneAndUpdate(
+          { _id: post._id },
+          { $set: { likeCount: (post.likeCount += 1), user: post.user = user } },
+          { new: true }
+        );
+          await doc.save();
+          return res.status(200).json({success: true, doc}) 
+       }
+    }
+    
   } catch (err) {
-    console.log(err);
+    return res.status(400).json({success: false, message: err.message})
   }
 };
 
