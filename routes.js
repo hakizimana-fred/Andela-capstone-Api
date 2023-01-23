@@ -152,6 +152,7 @@ router.get('/posts', auth, getPosts);
  *              - title
  *              - content
  *              - author
+ *              - imgUrl
  *            properties:
  *              title:
  *                type: string
@@ -162,6 +163,9 @@ router.get('/posts', auth, getPosts);
  *              author:
  *                type: string
  *                default: Fred
+ *              imgUrl:
+ *                type: string
+ *                default: Sample image
  *     responses:
  *      200:
  *        description: Created
@@ -212,7 +216,7 @@ router.get('/posts/:id', auth, getSinglePost);
  *     - Posts
  *     summary: Edit a Post
  *     parameters:
- *      - name: blogId
+ *      - name: id
  *        in: path
  *        required: true
  *     requestBody:
@@ -225,6 +229,7 @@ router.get('/posts/:id', auth, getSinglePost);
  *              - title
  *              - content
  *              - author
+ *              - imgUrl
  *            properties:
  *              title:
  *                type: string
@@ -235,6 +240,9 @@ router.get('/posts/:id', auth, getSinglePost);
  *              author:
  *                type: string
  *                default: Fred
+ *              imgUrl:
+ *                type: string
+ *                default: Sample Image
  *     responses:
  *      200:
  *        description: Created

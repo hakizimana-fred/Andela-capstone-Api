@@ -29,9 +29,9 @@ const authorize = async (req, res, next) => {
         if (user && user.role === 'admin') {
             return next();
         }
-        return res.status(500).json({ message: 'Not authorized' });
+        return res.status(500).json({success: false, message: 'Not authorized user' });
     } catch (err) {
-        return res.status(500).json({ message: 'Not authorized' });
+        return res.status(500).json({success: false,  message: 'Not authorized user' });
     }
 };
 

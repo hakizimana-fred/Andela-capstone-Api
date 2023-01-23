@@ -204,7 +204,7 @@ const updatePost = async (req, res) => {
     if (error) {
       return res.status(200).json({err: error.details})
     }
-    if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({message: 'Invalid ID'})
+    //if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({message: 'Invalid ID'})
 
     const post = await Post.findOne({ _id: req.params.id });
 
@@ -290,11 +290,6 @@ const getComments = async (req, res) => {
 
 const postLike = async (req, res) => {
   try {
-    // if (!mongoose.isValidObjectId(req.params.blogId))
-    //   return res.status(400).json({ message: "Invalid blog id" });
-    // const blogFound = await Post.findById(req.params.blogId);
-    // if (!blogFound) return res.status(400).json({ message: "No blog found" });
-
     const user = req.user;
     const post = await Like.findOne({post: req.params.blogId})
     //if no post
